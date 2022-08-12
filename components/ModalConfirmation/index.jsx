@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity as TO, Modal, Image } from 'react-native';
 import { Camera, CameraType } from 'expo-camera';
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 import tw from 'twrnc';
 
-export default function ModalConfirmation({ show, close, turnOffCompressor, turnOnCompressor, toggle }) {
+export default function ModalConfirmation({ show, close, turnOffCompressor, capturedPhoto, setCapturedPhoto, turnOnCompressor, toggle }) {
+  const cameraRef = useRef(null)
   const [hasPermission, setHasPermission] = useState(null);
   const [camera, setCamera] = useState(false)
   const [type, setType] = useState(CameraType.back);
@@ -20,6 +23,16 @@ export default function ModalConfirmation({ show, close, turnOffCompressor, turn
 
   if (hasPermission === null) return <View />;
   if (hasPermission === false) return <Text>No access to camera</Text>
+
+  const takePicture = async () => {
+    if (cameraRef) {
+      let data = await cameraRef.current.takePictureAsync({})
+      setCapturedPhoto(data?.uri)
+      AsyncStorage.setItem("uri", data?.uri?.toString())
+
+    }
+  }
+
 
   return (
     <>
@@ -59,17 +72,32 @@ export default function ModalConfirmation({ show, close, turnOffCompressor, turn
       <Modal animationType="slide" transparent={true} visible={camera}>
         <View style={tw`w-full h-full bg-[#111]  absolute`} />
         <View style={tw`w-full h-full flex flex-1 items-center justify-evenly`}>
-          <Camera style={tw`w-[130%] h-[75%] bg-gray-300 `} type={type} />
-          <View style={tw`mb-10 flex-row w-full items-center justify-evenly`}>
-            <TO onPress={() => setCamera(false)}>
-              <MaterialIcons name='arrow-back' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
-            </TO>
-            <TO onPress={() => [turnOffCompressor(), close(), setCamera(false)]} style={tw`bg-[#fff] p-10 rounded-full`}>
-            </TO>
-            <TO onPress={() => setType(type === CameraType.back ? CameraType.front : CameraType.back)}>
-              <MaterialIcons name='flip-camera-android' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
-            </TO>
-          </View>
+          {capturedPhoto ?
+            <Image style={tw`w-[130%] h-[75%] bg-gray-300 `}
+              source={{ uri: capturedPhoto }}
+            /> :
+            <Camera ref={cameraRef} style={tw`w-[130%] h-[75%] bg-gray-300 `} type={type} />}
+          {capturedPhoto ?
+            <View style={tw`mb-10 flex-row w-full items-center justify-evenly`}>
+              <TO onPress={() => setCapturedPhoto(null)}>
+                <MaterialIcons name='delete' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
+              </TO>
+
+              <TO onPress={() => [turnOffCompressor(), close(), setCamera(false)]}>
+                <MaterialIcons name='save' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
+              </TO>
+            </View> :
+            <View style={tw`mb-10 flex-row w-full items-center justify-evenly`}>
+              <TO onPress={() => setCamera(false)}>
+                <MaterialIcons name='arrow-back' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
+              </TO>
+              <TO onPress={() => takePicture()} style={tw`bg-[#fff] p-10 rounded-full`}>
+              </TO>
+              <TO onPress={() => setType(type === CameraType.back ? CameraType.front : CameraType.back)}>
+                <MaterialIcons name='flip-camera-android' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
+              </TO>
+            </View>
+          }
         </View>
       </Modal>
     </>
