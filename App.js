@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Switch, Text, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import tw from 'twrnc';
 import ModalConfirmation from './components/ModalConfirmation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 export default function App() {
   const [toggle, setToggle] = useState(true)
   const [showModal, setShowModal] = useState(false)
+
+  const myToggle = (bool) => {
+    setToggle(bool);
+    AsyncStorage.setItem("toggle", toggle.toString())
+  }
+
+  useEffect(() => {
+    AsyncStorage.getItem("toggle").then(value => {
+      value === "false" ? setToggle(true) : setToggle(false);
+    });
+  }, [])
 
   return (
     <View style={tw`flex flex-1  items-center justify-center`}>
@@ -23,7 +36,7 @@ export default function App() {
             style={{ transform: [{ scaleX: 2 }, { scaleY: 2 }] }}
           />
         </View>
-        <ModalConfirmation show={showModal} toggle={toggle} turnOffCompressor={() => setToggle(false)} turnOnCompressor={() => setToggle(true)} close={() => setShowModal(!showModal)} />
+        <ModalConfirmation show={showModal} toggle={toggle} turnOffCompressor={() => myToggle(false)} turnOnCompressor={() => myToggle(true)} close={() => setShowModal(!showModal)} />
       </LinearGradient>
     </View>
   );
