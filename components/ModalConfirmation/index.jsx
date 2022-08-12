@@ -8,6 +8,7 @@ import tw from 'twrnc';
 
 export default function ModalConfirmation({ show, close, turnOffCompressor, turnOnCompressor, toggle }) {
   const [hasPermission, setHasPermission] = useState(null);
+  const [camera, setCamera] = useState(false)
   const [type, setType] = useState(CameraType.back);
 
   useEffect(() => {
@@ -21,54 +22,57 @@ export default function ModalConfirmation({ show, close, turnOffCompressor, turn
   if (hasPermission === false) return <Text>No access to camera</Text>
 
   return (
-    <Modal animationType="slide" transparent={true} visible={show}>
-      <View style={tw`w-full h-full bg-black opacity-30 absolute`} />
-      <View style={tw`flex-1 justify-center items-center`}>
-        <View style={tw`flex items-center bg-[#333] ${toggle ? ' w-[95%] h-[65%]' : 'w-[90%] h-[50%]'} overflow-hidden rounded-2xl shadow-xl`}>
-          <View style={tw`bg-[#222] flex  ${toggle ? 'flex-2' : 'flex-2.5'}  flex-row justify-end items-center w-full`}>
-            <TO onPress={close}>
-              <Ionicons name='close' size={40} style={tw`mx-2 text-white rounded-xl bg-[#444] px-[1px]`} />
-            </TO>
-          </View>
-          <View style={tw`flex flex-18 w-full justify-center items-center`}>
-            {toggle ?
-              <View style={tw`flex items-center justify-between w-full h-full`}>
-                <View style={tw`flex w-[395px] h-[395px] overflow-hidden`}>
-                  <Camera style={tw`w-[100%] h-[130%] bg-gray-300 `} type={type} />
-                </View>
-                <View style={tw`mb-10 flex-row w-full items-center justify-evenly`}>
-                  <TO onPress={() => setType(type === CameraType.back ? CameraType.front : CameraType.back)}>
-                    <MaterialIcons name='flip-camera-android' size={40} style={tw`mx-2 text-white bg-[#555] p-2 rounded-3xl`} />
-                  </TO>
-                  <TO onPress={() => [turnOffCompressor(), close()]}>
-                    <Ionicons name='camera' size={40} style={tw`mx-2 text-white bg-[#555] p-2 rounded-3xl`} />
-                  </TO>
-                </View>
-              </View>
-              :
-              <View style={tw`flex w-full mb-5 justify-center items-center`}>
-                <Image style={tw`w-[50%] h-[50%]`} source={require('../../assets/caution-sign.png')} />
-                <Text style={[tw`text-2xl text-center font-bold text-white mb-3`]}>
-                  Deseja realmente ligar o compressor?
+    <>
+      <Modal animationType="slide" transparent={true} visible={show}>
+        <View style={tw`w-full h-full bg-black opacity-30 absolute`} />
+        <View style={tw`flex-1 justify-center items-center`}>
+          <View style={tw`flex items-center bg-[#333] w-[95%] h-[40%] overflow-hidden rounded-2xl shadow-xl`}>
+            <View style={tw`bg-[#222] flex flex-4 flex-row justify-end items-center w-full`}>
+              <TO onPress={close}>
+                <Ionicons name='close' size={40} style={tw`mx-2 text-white rounded-xl bg-[#444] px-[1px]`} />
+              </TO>
+            </View>
+            <View style={tw`flex flex-22 w-full justify-center items-center`}>
+              <View style={tw`flex items-center justify-center w-full`}>
+                <Image style={tw`w-[50%] h-[50%]`} source={toggle ? require('../../assets/camera.png') : require('../../assets/caution-sign.png')} />
+                <Text style={[tw`text-2xl text-center font-bold text-white `]}>
+                  {toggle ? 'Tira uma foto do compressor?' : 'Deseja realmente ligar o compressor?'}
                 </Text>
-                <View style={tw`flex flex-row w-full items-center justify-evenly px-5`}>
-                  <TO onPress={() => close()} style={tw`text-white flex items-center justify-center px-5 py-2 my-3 rounded-2xl`}>
+                {toggle && <Text style={[tw`text-xl text-center font-semibold text-[#777] mb-3`]}> (Só pra garantir né? rs) </Text>}
+                <View style={tw`flex flex-row w-full items-center justify-evenly px-5 pb-2`}>
+                  <TO onPress={() => close()} style={tw`text-white flex items-center justify-center px-10 py-2 my-3 rounded-2xl`}>
                     <Text style={[tw`text-[#777] text-lg font-bold`]}>
                       cancelar
                     </Text>
                   </TO>
-                  <TO onPress={() => [turnOnCompressor(), close()]} style={tw`text-white flex items-center justify-center px-5 py-2 my-3 rounded-2xl bg-[#D42B15]`}>
+                  <TO onPress={() => toggle ? [setCamera(true)] : [turnOnCompressor(), close()]} style={tw`text-white flex items-center justify-center px-10 py-2 my-3 rounded-2xl ${toggle ? "bg-[#276de6]" : "bg-[#D42B15]"}`}>
                     <Text style={[tw`text-white text-lg font-bold`]}>
-                      Confirmar
+                      {toggle ? 'Claro!' : 'Confirmar'}
                     </Text>
                   </TO>
                 </View>
               </View>
-            }
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+      <Modal animationType="slide" transparent={true} visible={camera}>
+        <View style={tw`w-full h-full bg-[#111]  absolute`} />
+        <View style={tw`w-full h-full flex flex-1 items-center justify-evenly`}>
+          <Camera style={tw`w-[130%] h-[75%] bg-gray-300 `} type={type} />
+          <View style={tw`mb-10 flex-row w-full items-center justify-evenly`}>
+            <TO onPress={() => setCamera(false)}>
+              <MaterialIcons name='arrow-back' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
+            </TO>
+            <TO onPress={() => [turnOffCompressor(), close(), setCamera(false)]} style={tw`bg-[#fff] p-10 rounded-full`}>
+            </TO>
+            <TO onPress={() => setType(type === CameraType.back ? CameraType.front : CameraType.back)}>
+              <MaterialIcons name='flip-camera-android' size={65} style={tw`mx-2 text-white p-3 rounded-full`} />
+            </TO>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }
 
