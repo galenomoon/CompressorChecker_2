@@ -24,19 +24,19 @@ export default function ModalConfirmation({ show, close, turnOffCompressor, turn
     <Modal animationType="slide" transparent={true} visible={show}>
       <View style={tw`w-full h-full bg-black opacity-30 absolute`} />
       <View style={tw`flex-1 justify-center items-center`}>
-        <View style={tw`flex items-center bg-[#333] w-[90%] ${toggle ? 'h-[70%]' : 'h-[50%]'} overflow-hidden rounded-2xl shadow-xl`}>
-          <View style={tw`bg-[#555] flex  ${toggle ? 'flex-2' : 'flex-2.5'}  flex-row justify-end items-center w-full`}>
+        <View style={tw`flex items-center bg-[#333] ${toggle ? ' w-[95%] h-[65%]' : 'w-[90%] h-[50%]'} overflow-hidden rounded-2xl shadow-xl`}>
+          <View style={tw`bg-[#222] flex  ${toggle ? 'flex-2' : 'flex-2.5'}  flex-row justify-end items-center w-full`}>
             <TO onPress={close}>
               <Ionicons name='close' size={40} style={tw`mx-2 text-white rounded-xl bg-[#444] px-[1px]`} />
             </TO>
           </View>
           <View style={tw`flex flex-18 w-full justify-center items-center`}>
             {toggle ?
-              <View style={tw`flex bg-white overflow-hidden w-[340px] h-[430px] items-center p-[30px] rounded-2 shadow-md`}>
-                <View style={tw`flex w-[320px] h-[320px] overflow-hidden rounded-xl`}>
-                  <Camera style={tw`w-[100%] h-[100] bg-gray-300 `} type={type} />
+              <View style={tw`flex items-center justify-between w-full h-full`}>
+                <View style={tw`flex w-[395px] h-[395px] overflow-hidden`}>
+                  <Camera style={tw`w-[100%] h-[130%] bg-gray-300 `} type={type} />
                 </View>
-                <View style={tw`h-18 flex-row w-full items-center justify-evenly`}>
+                <View style={tw`mb-10 flex-row w-full items-center justify-evenly`}>
                   <TO onPress={() => setType(type === CameraType.back ? CameraType.front : CameraType.back)}>
                     <MaterialIcons name='flip-camera-android' size={40} style={tw`mx-2 text-white bg-[#555] p-2 rounded-3xl`} />
                   </TO>
